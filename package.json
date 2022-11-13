@@ -1,15 +1,24 @@
 {
   "name": "pdf-graffiti",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "main": "dist/pdf-graffiti.umd.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:lib": "vue-cli-service build --target lib --name pdf-graffiti ./src/lib/index.js"
   },
   "dependencies": {
     "core-js": "^3.8.3",
-    "vue": "^2.6.14"
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "vue": "^2.6.14",
+    "vue-pdf": "^4.3.0",
+    "vue-signature-pad": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -26,6 +35,13 @@
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
     "vue-template-compiler": "^2.6.14"
+  },
+  "peerDependencies": {
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "vue": "^2.6.14",
+    "vue-pdf": "^4.3.0",
+    "vue-signature-pad": "^3.0.2"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

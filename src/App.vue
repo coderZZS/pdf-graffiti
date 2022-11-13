@@ -1,17 +1,15 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <PdfGraffiti></PdfGraffiti>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-
+import PdfGraffiti from "./lib/PdfGraffiti.vue";
 export default {
   name: "App",
   components: {
-    HelloWorld,
+    PdfGraffiti,
   },
 };
 </script>
