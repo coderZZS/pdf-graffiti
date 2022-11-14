@@ -29,6 +29,12 @@
     
 
 ```
+###### props
+| 属性名 | 描述 | 类型 | 是否必传|
+|  ----  | ----  | ---- | ---- |
+| v-model | 存储的数据, 通过save方法同步更新 | object: { isEmpty, data }</br>isEmpty: 是否是有效数据</br>data: 存储的数据数据，DataURL | 否 |
+| isEdit | 是否处于编辑模式，需要 .sync 修饰符修饰 | boolean | 否 |
+| pdfUrl | 需要渲染的pdf链接地址 | string | 否 |
 
 
 ###### 提供的基本接口
