@@ -39,9 +39,7 @@ export default {
   },
   methods: {
     save() {
-      console.log(this.$refs.signaturePad, "this.$refs.signaturePad.");
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
-      this.catchData = data;
       this.$emit("save", { isEmpty, data });
     },
     undo() {

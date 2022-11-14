@@ -1,7 +1,12 @@
 {
     "pdf-graffiti": {
         "attributes": [
-            "type"
+            "v-model",
+            "isEdit",
+            "pdfUrl",
+            "@save",
+            "@onLoaded",
+            "@onPageScroll"
         ]
     }
 }

@@ -3,7 +3,6 @@ import Signature from "./Signature.vue";
 import Uploader from "./Uploader.vue";
 
 const components = [Uploader, PdfGraffiti, Signature];
-// const components = [PdfGraffiti, UploadFile];
 
 const install = (vue) => {
   components.forEach((component) => {

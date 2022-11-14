@@ -16,13 +16,16 @@
         :isEdit="isEdit"
         ref="signature"
         :canvasHeight="height + 'px'"
+        @save="onSave"
         v-if="isReady"
       ></Signature>
     </div>
     <Uploader @selectChange="changeFile" ref="uploader" />
-    <div class="handle-list">
-      <div @click="isEdit = !isEdit" class="show-btn">签字</div>
-      <div @click="back" class="show-btn">撤销</div>
+    <div class="handle-list" v-if="showTools">
+      <div @click="toggleEdit" class="show-btn">
+        {{ isEdit ? "禁用" : "启用" }}
+      </div>
+      <div @click="undo" class="show-btn">撤销</div>
       <div @click="clear" class="show-btn">清除</div>
       <div @click="eraser" class="show-btn">颜色</div>
       <div @click="save" class="show-btn">保存</div>
@@ -42,8 +45,6 @@ import VuePdf from "vue-pdf";
 import { jsPDF } from "jspdf";
 import Signature from "./Signature.vue";
 import Uploader from "./Uploader.vue";
-const pdfUrl =
-  "https://coke-1304800772.cos.ap-chongqing.myqcloud.com/test/01%E3%80%81beego%20%E7%AE%80%E4%BB%8B%20%E4%BB%A5%E5%8F%8Abeego%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E3%80%81bee%E8%84%9A%E6%89%8B%E6%9E%B6%E4%BD%BF%E7%94%A8%E3%80%81%20%E5%88%9B%E5%BB%BA%E3%80%81%E8%BF%90%E8%A1%8C%E9%A1%B9%E7%9B%AE.pdf";
 export default {
   name: "PdfGraffiti",
   components: {
@@ -51,63 +52,109 @@ export default {
     Signature,
     Uploader,
   },
+  props: {
+    value: {
+      type: [Object, String],
+      default: () => {
+        return {};
+      },
+    },
+    isEdit: {
+      type: Boolean,
+      default: false,
+    },
+    pdfUrl: {
+      type: String,
+      default: "",
+    },
+  },
   data() {
     return {
       src: "",
       numPages: null,
       show: true,
-      isEdit: false,
-      isEraser: false,
       height: 60,
       isReady: false,
-      pdfInfo: {
-        pdf: "xxx.pdf",
-      },
+      showTools: false,
     };
   },
-  mounted() {
-    this.render(pdfUrl);
-  },
   watch: {
-    isReady: {
-      handler: function (val) {
-        console.log(val, "-----------");
+    pdfUrl: {
+      handler: function (url) {
+        if (!url) return;
+        this.$nextTick(() => {
+          this.render(url);
+        });
       },
-      deep: true,
+      immediate: true,
     },
   },
   methods: {
+    toggleEdit() {
+      this.$emit("update:isEdit", !this.isEdit);
+    },
+    /**
+     * 保存当前数据
+     * @return {object}
+     */
+    onSave({ isEmpty, data }) {
+      this.$emit("onSave", { isEmpty, data });
+      this.$emit("input", { isEmpty, data });
+    },
+    /**
+     * 渲染pdf
+     * @param {string} url 绝对地址/DataURL
+     */
     render(url) {
       this.src = VuePdf.createLoadingTask(url);
       this.src.promise.then((pdf) => {
         this.numPages = pdf.numPages;
       });
     },
-    back() {
+    /**
+     * 撤销
+     */
+    undo() {
       this.$refs.signature.undo();
     },
+    /**
+     * 清除当前画布
+     */
     clear() {
       this.$refs.signature.clear();
     },
-    eraser() {
-      this.isEraser = !this.isEraser;
-      const color = this.isEraser ? "red" : "#000";
+    /**
+     * 切换颜色
+     * @param {string} color 十六进制颜色码
+     */
+    eraser(color = "#000") {
       this.$refs.signature.eraser(color);
     },
+    /**
+     * pdf加载完成
+     */
     loaded(page) {
       if (page !== this.numPages) return;
       const dom = document.querySelector(".pdf-content");
       this.height = dom.offsetHeight;
       this.isReady = true;
-      console.log("ready", "---------------", this.isReady);
+      this.$emit("onLoaded", this.numPages);
     },
+    /**
+     * 保存
+     */
     save() {
-      console.log("save");
       this.$refs.signature.save();
     },
+    /**
+     * 导入pdf
+     */
     importPdf() {
       this.$refs.uploader.selectFile();
     },
+    /**
+     * 下载pdf
+     */
     download(canvas) {
       const imageBase64 = canvas.toDataURL("image/png");
       const imageFile = this.dataUrlToFile(imageBase64);
@@ -119,6 +166,9 @@ export default {
       download.setAttribute("download", imageFile.name);
       download.click();
     },
+    /**
+     * 导出pdf+笔迹为图片
+     */
     async exportAll() {
       const pdfCanvas = await this.getContainerToImg("pdf-content");
       this.download(pdfCanvas);
@@ -146,20 +196,32 @@ export default {
         type: "image/png",
       });
     },
+    /**
+     * 导出笔迹为png
+     */
     async exportNote() {
       const noteCanvas = await this.getContainerToImg("note-container");
       this.download(noteCanvas);
     },
+    /**
+     * 前往页码
+     * @param {number} page 页码
+     */
     toPageLocation(page) {
       document.querySelector("#pdf" + page).scrollIntoView(true);
     },
-    initNote(img) {
-      this.$refs.signature.fromDataURL(img);
+    /**
+     * 初始化笔迹
+     * @param {string} DataURL 存储的数据DataURL
+     */
+    initNote(DataURL) {
+      if (!DataURL) return;
+      this.$refs.signature.fromDataURL(DataURL);
     },
     importNote() {
       this.initNote();
     },
-    async htmlToPdf() {
+    async htmlToPdf(fileName = "文件") {
       const pdfCanvas = await this.getContainerToImg("pdf-content");
       //   const options = {
       //     scale: 12,
@@ -198,8 +260,11 @@ export default {
           }
         }
       }
-      PDF.save("测试" + ".pdf");
+      PDF.save(fileName + ".pdf");
     },
+    /**
+     * 加载本地pdf
+     */
     selectFile() {
       this.$refs.uploader.selectFile();
     },
@@ -213,11 +278,8 @@ export default {
     },
     onPageScroll(e) {
       const top = e.scrollTop / this.height;
-      console.log(top);
+      this.$emit("onPageScroll", top);
     },
-  },
-  created() {
-    console.log(html2canvas, "html2canvas---");
   },
 };
 </script>
@@ -257,7 +319,6 @@ export default {
   height: 100%;
   width: 100%;
   top: 0;
-  border: 1px solid #e5e5e5;
   z-index: 998;
 }
 </style>

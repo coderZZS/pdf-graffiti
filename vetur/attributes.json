@@ -1,6 +1,26 @@
 {
-    "van-action-bar/type": {
+    "pdf-graffiti/v-model": {
+        "type": "string | object",
+        "description": "绘制的数据, 点击保存会自动更新。 `isEmpty`: 是否是有效数据 | `data`: 数据。"
+    },
+    "pdf-graffiti/isEdit": {
+        "type": "boolean",
+        "description": "是否启用编辑模式, 默认值: `false`。"
+    },
+    "pdf-graffiti/pdfUrl": {
         "type": "string",
-        "description": "当前的模式"
+        "description": "需要渲染的pdf地址, 地址填充会自动渲染。"
+    },
+    "pdf-graffiti/@save": {
+        "type": "function",
+        "description": "保存的回调, 返回值和v-model一致。"
+    },
+    "pdf-graffiti/@onLoaded": {
+        "type": "function",
+        "description": "pdf加载完成的回调, 返回值是当前加载完成pdf的页码数。"
+    },
+    "pdf-graffiti/@onPageScroll": {
+        "type": "function",
+        "description": "滚动的回调, 返回值是当前滚动的top值。"
     }
 }
