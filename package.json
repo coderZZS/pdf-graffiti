@@ -1,10 +1,11 @@
 {
   "name": "pdf-graffiti",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "main": "dist/pdf-graffiti.umd.js",
   "files": [
-    "dist"
+    "dist",
+    "vetur"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -45,5 +46,9 @@
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
+  },
+  "vetur": {
+    "tags": "vetur/tags.json",
+    "attributes": "vetur/attributes.json"
   }
 }

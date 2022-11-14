@@ -125,8 +125,12 @@ export default {
     },
     async getContainerToImg(className) {
       const container = document.querySelector(`.${className}`);
-      const canvas = await html2canvas(container);
-      return canvas;
+      try {
+        const canvas = await html2canvas(container);
+        return canvas;
+      } catch (error) {
+        console.log(error);
+      }
     },
     dataUrlToFile(dataurl, filename = "文件") {
       // 获取到base64编码
@@ -212,10 +216,13 @@ export default {
       console.log(top);
     },
   },
+  created() {
+    console.log(html2canvas, "html2canvas---");
+  },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .content {
   position: relative;
   height: 100%;
